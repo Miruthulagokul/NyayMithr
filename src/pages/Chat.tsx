@@ -30,68 +30,57 @@ const Chat = () => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  if (!inputMessage.trim()) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: inputMessage,
+  const userMessage: Message = {
+    id: Date.now().toString(),
+    type: 'user',
+    content: inputMessage,
+    timestamp: new Date()
+  };
+
+  setMessages(prev => [...prev, userMessage]);
+  setInputMessage("");
+
+  try {
+    const response = await fetch(
+      "https://webhooks.workato.com/webhooks/rest/a8ecdae0-cb16-4328-8d26-ab2770e7fe79/user_query",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          user_query: inputMessage // ✅ this key must match what your Workato webhook expects
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    const botMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      type: "bot",
+      content:
+        result?.choices?.[0]?.message?.content ||
+        "Sorry, I couldn’t understand that. Please try again.",
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage("");
+    setMessages(prev => [...prev, botMessage]);
+  } catch (error) {
+    console.error("Failed to get response from Workato webhook:", error);
 
-    // 🔁 Workato Webhook Trigger
-    try {
-      await fetch('https://webhooks.workato.com/webhooks/rest/a8ecdae0-cb16-4328-8d26-ab2770e7fe79/user_query', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: inputMessage,
-          timestamp: new Date().toISOString()
-        })
-      });
-    } catch (error) {
-      console.error("Failed to trigger Workato webhook:", error);
-    }
+    const errorMessage: Message = {
+      id: (Date.now() + 2).toString(),
+      type: "bot",
+      content: "Oops! Something went wrong. Please try again later.",
+      timestamp: new Date()
+    };
 
-    // 🤖 Simulate bot response
-    setTimeout(() => {
-      const botResponse = getBotResponse(inputMessage);
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'bot',
-        content: botResponse,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botMessage]);
-    }, 1000);
-  };
-
-  const getBotResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-    
-    if (input.includes('rti') || input.includes('right to information')) {
-      return "I can help you file an RTI application! This is a powerful tool to access government information. Let me guide you through this step by step. Could you tell me which department or specific information you need? Also, if you can share your state or city, I can provide more targeted guidance.";
-    }
-    
-    if (input.includes('fir') || input.includes('police') || input.includes('complaint')) {
-      return "Don't worry, I'm here to help you with registering an FIR. You have the right to file a complaint, and I'll guide you through the process. Can you tell me briefly what happened? Is it related to theft, fraud, harassment, or something else? This will help me provide specific guidance.";
-    }
-    
-    if (input.includes('consumer') || input.includes('refund') || input.includes('defective') || input.includes('warranty')) {
-      return "I can definitely help you with consumer rights! You have strong protection under consumer laws. Let me know - are you dealing with a defective product, service issue, or billing problem? Also, do you have any purchase receipts or documentation? Let's get your issue resolved.";
-    }
-    
-    if (input.includes('cyber') || input.includes('online') || input.includes('fraud') || input.includes('scam')) {
-      return "You're not alone in this - I'll help you handle this cybercrime issue. Online fraud is unfortunately common, but there are clear steps we can take. Can you tell me what type of online issue you're facing? Is it related to payments, identity theft, or something else? Have you lost any money?";
-    }
-    
-    return "I understand you need legal help, and I'm here to support you through this. Could you provide a bit more detail about your specific situation? Are you dealing with a government service, consumer issue, police matter, or something else? The more context you give me, the better I can guide you with the right legal steps.";
-  };
+    setMessages(prev => [...prev, errorMessage]);
+  }
+};
 
   const handleNewChat = () => {
     setMessages([
