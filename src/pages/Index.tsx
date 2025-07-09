@@ -21,7 +21,7 @@ const Index = () => {
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">NyaySathi</h1>
+                <h1 className="text-2xl font-bold text-gray-900">NyayaMithr</h1>
                 <p className="text-sm text-gray-600">Your Legal Companion</p>
               </div>
             </div>
@@ -50,7 +50,7 @@ const Index = () => {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Trust NyaySathi?</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Trust NyayaMithr?</h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 We're here to make legal help accessible, understandable, and stress-free for every Indian citizen.
               </p>
@@ -114,7 +114,7 @@ const Index = () => {
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
                   <Shield className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold">NyaySathi</span>
+                <span className="text-xl font-bold">NyayaMithr</span>
               </div>
               <p className="text-gray-400">
                 Making legal help accessible to every Indian citizen, one step at a time.
